@@ -7,37 +7,39 @@ type Article struct {
 	Author  string	`json:"author"`
 }
 
-func ShowArticle(id uint64) *Article {
-
-	article := &Article{}
-
-	err := DB().Where("id = ?", id).First(article).Error
-
-	if err != nil {
-		//todo
-	}
-
-	return article
+type ArticleInterface interface {
+	SHowArticle(id uint64) (Article, err error)
+	StoreArticle(article *Article) (id uint64, err error)
+	IndexArticle() (articles []Article, err error)
 }
 
-func StoreArticle(article *Article) (id uint64) {
-	err := DB().Save(&article)
+func (A Article) ShowArticle(id uint64) (article Article, err error) {
 
-	if err != nil {
-		//todo
+	article = Article{}
+
+	if err := DB().Where("id = ? ", id).First(&article).Error; err != nil {
+		return article, err
 	}
 
-	return article.Id
+	return article, nil
 }
 
-func IndexArticle() []*Article {
-	articles := make([]*Article, 0)
+func (A Article) StoreArticle(article Article) (id uint64, err error) {
 
-	err := DB().Find(&articles).Error
-
-	if err != nil {
-		//todo
+	if err := DB().Save(&article).Error; err != nil {
+		return id, err
 	}
 
-	return articles
+	return article.Id, nil
+}
+
+func (A Article) IndexArticle() (articles []Article, err error) {
+
+	articles = []Article{}
+
+	if err := DB().Find(&articles).Error; err != nil {
+		return articles, err
+	}
+
+	return articles, nil
 }

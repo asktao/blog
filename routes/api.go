@@ -8,11 +8,13 @@ import (
 	"os"
 )
 
+var articleController controllers.ArticleController = controllers.ArticleController{}
+
 func Run() {
 	r := mux.NewRouter()
-	r.HandleFunc("/articles/{id:[0-9]+}", controllers.ShowArticle).Methods("GET")
-	r.HandleFunc("/articles", controllers.IndexArticle).Methods("GET")
-	r.HandleFunc("/articles", controllers.StoreArticle).Methods("POST")
+	r.HandleFunc("/articles/{id:[0-9]+}", articleController.ShowArticle).Methods("GET")
+	r.HandleFunc("/articles", articleController.IndexArticle).Methods("GET")
+	r.HandleFunc("/articles", articleController.StoreArticle).Methods("POST")
 
 	port := os.Getenv("PORT")
 	if port == "" {
