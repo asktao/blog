@@ -28,6 +28,10 @@ func init() {
 	if err != nil {
 		log.Fatal("Failed to establish a MySQL link")
 	}
+
+	if os.Getenv("APP_DEBUG") == "True" {
+		conn.LogMode(true)
+	}
 	db = conn
 }
 
