@@ -8,12 +8,12 @@ type Article struct {
 }
 
 type ArticleInterface interface {
-	SHowArticle(id uint64) (Article, err error)
-	StoreArticle(article *Article) (id uint64, err error)
-	IndexArticle() (articles []Article, err error)
+	GetArticle(id uint64) (Article, err error)
+	SaveArticle(article *Article) (id uint64, err error)
+	ListArticle(limit uint64, offset uint64) (articles []Article, err error)
 }
 
-func (A Article) ShowArticle(id uint64) (article Article, err error) {
+func (A Article) GetArticle(id uint64) (article Article, err error) {
 
 	article = Article{}
 
@@ -24,7 +24,7 @@ func (A Article) ShowArticle(id uint64) (article Article, err error) {
 	return article, nil
 }
 
-func (A Article) StoreArticle(article Article) (id uint64, err error) {
+func (A Article) SaveArticle(article Article) (id uint64, err error) {
 
 	if err := DB().Save(&article).Error; err != nil {
 		return id, err
@@ -33,11 +33,11 @@ func (A Article) StoreArticle(article Article) (id uint64, err error) {
 	return article.Id, nil
 }
 
-func (A Article) IndexArticle() (articles []Article, err error) {
+func (A Article) ListArticle(limit uint64, offset uint64) (articles []Article, err error) {
 
 	articles = []Article{}
 
-	if err := DB().Find(&articles).Error; err != nil {
+	if err := DB().Limit(limit).Offset(offset).Find(&articles).Error; err != nil {
 		return articles, err
 	}
 
