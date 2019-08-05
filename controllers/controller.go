@@ -26,6 +26,10 @@ func (c *Controller) Pagination (r *http.Request) (limit uint64, offset uint64) 
 
 	offset, _ = strconv.ParseUint(r.FormValue("offset"), 10, 64)
 
+	if limit == 0 {
+		limit = 10
+	}
+
 	return limit, offset
 }
 
