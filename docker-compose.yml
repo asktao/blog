@@ -1,7 +1,22 @@
-version: '1'
+version: '3.3'
 
 services:
-  api:
-    image: api
+  blog-api:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: api-go-blog
     ports:
       - 8080:8080
+    links:
+      - mysql
+  mysql:
+    build:
+      context: .
+      dockerfile: ./MySQL.Dockerfile
+    image: mysql-go-blog
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"
