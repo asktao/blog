@@ -16,7 +16,7 @@ func Run() {
 	r.HandleFunc("/articles", articleController.IndexArticle).Methods("GET")
 	r.HandleFunc("/articles", articleController.StoreArticle).Methods("POST")
 
-	port := os.Getenv("PORT")
+	port := os.Getenv("APP_PORT")
 	if port == "" {
 		port = "8080"
 	}
