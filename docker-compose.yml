@@ -18,5 +18,8 @@ services:
     restart: always
     env_file:
       - ./.env
+    volumes:
+      - ./blog.sql:/docker-entrypoint-initdb.d/blog.sql
     environment:
       MYSQL_ROOT_PASSWORD: "${DB_PASSWORD}"
+      MYSQL_DATABASE: "${DB_DATABASE}"

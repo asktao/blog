@@ -2,9 +2,6 @@
 # Created by https://www.gitignore.io/api/go,macos,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=go,macos,visualstudiocode
 
-# Env file
-*.env
-
 ### Go ###
 # Binaries for programs and plugins
 *.exe

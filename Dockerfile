@@ -4,16 +4,15 @@ FROM golang:1.12
 RUN echo "Asia/Shanghai" > /etc/timezone
 RUN dpkg-reconfigure -f noninteractive tzdata
 
-CMD mkdir /blog
+CMD mkdir /blog-api
 
-ADD . /blog
+ADD . /blog-api
 
-WORKDIR /blog
+WORKDIR /blog-api
 
 RUN GO111MODULE=on
 
 RUN go build -o app .
-
 
 CMD ["./app"]
 #ENTRYPOINT["./app"]
