@@ -5,8 +5,8 @@ Backend API for a simple blog
 
 ## Quick start
 
-1. clone http://github.com/asktao/blog && cd blog
-2. Run using docker-compose up -d
+1. `git clone http://github.com/asktao/blog && cd blog`
+2. Run using `docker-compose up -d`
 
 
 
