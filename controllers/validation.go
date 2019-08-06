@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	REQUIRED     = "required"
-	MAX          = "int-max"
-	MIN          = "int-min"
-	TYPE         = "type"
+	Required     = "required"
+	Max          = "int-max"
+	Min          = "int-min"
+//	Type         = "type"
 	StrMaxLength = "str-max-len"
 	StrMinLength = "str-min-len"
 	StrLength    = "str-len"
@@ -46,23 +46,22 @@ func (v *Validation) Validator(bean interface{}) error {
 func fieldValidate(fieldName, valid string, value reflect.Value) error {
 	valids := strings.Split(valid, " ")
 	for _, valid := range valids {
+		//if strings.Index(valid, Type) != -1 {
+		//	v := value.Type().Name()
+		//	split := strings.Split(valid, "=")
+		//	t := split[1]
+		//	if v != t {
+		//		return errors.New("The " + fieldName + " must be a" + t)
+		//	}
+		//}
 
-		if strings.Index(valid, TYPE) != -1 {
-			v := value.Type().Name()
-			split := strings.Split(valid, "=")
-			t := split[1]
-			if v != t {
-				return errors.New(fieldName + " must be a" + t)
-			}
-		}
-
-		if strings.Index(valid, REQUIRED) != -1 {
+		if strings.Index(valid, Required) != -1 {
 			str := value.String()
 			if str == "" {
-				return errors.New(fieldName + " field is required")
+				return errors.New("The " + fieldName + " field is required.")
 			}
 		}
-		if strings.Index(valid, MIN) != -1 {
+		if strings.Index(valid, Min) != -1 {
 			v := value.Int()
 			split := strings.Split(valid, "=")
 			rule, err := strconv.Atoi(split[1])
@@ -70,11 +69,12 @@ func fieldValidate(fieldName, valid string, value reflect.Value) error {
 				return errors.New(fieldName + ":invalid validation method")
 			}
 			if int(v) < rule {
-				return errors.New(fieldName + " field may not be greater" + strconv.Itoa(rule))
+				return errors.New("The " + fieldName + " must be at least " + strconv.Itoa(rule) + ".")
+
 			}
 		}
 
-		if strings.Index(valid, MAX) != -1 {
+		if strings.Index(valid, Max) != -1 {
 			v := value.Int()
 			split := strings.Split(valid, "=")
 			rule, err := strconv.Atoi(split[1])
@@ -82,7 +82,7 @@ func fieldValidate(fieldName, valid string, value reflect.Value) error {
 				return errors.New(fieldName + ":invalid validation method")
 			}
 			if int(v) > rule {
-				return errors.New(fieldName + " field must <= " + strconv.Itoa(rule))
+				return errors.New("The " + fieldName + " may not be greater than " + strconv.Itoa(rule) + ".")
 			}
 		}
 		//字符串特殊处理
@@ -96,7 +96,7 @@ func fieldValidate(fieldName, valid string, value reflect.Value) error {
 					return errors.New(fieldName + " " + StrLength + " rule is error")
 				}
 				if len(v) != length {
-					return errors.New(fieldName + " str length  must be " + lenStr)
+					return errors.New("The " + fieldName + " must be " + lenStr + " characters.")
 				}
 			}
 			if strings.Index(valid, StrMaxLength) != -1 {
@@ -108,7 +108,7 @@ func fieldValidate(fieldName, valid string, value reflect.Value) error {
 					return errors.New(fieldName + " " + StrLength + " rule is error")
 				}
 				if len(v) > length {
-					return errors.New(fieldName + " str length  <= " + lenStr)
+					return errors.New("The " + fieldName + " may not be greater than " + lenStr + " characters.")
 				}
 			}
 
@@ -121,7 +121,7 @@ func fieldValidate(fieldName, valid string, value reflect.Value) error {
 					return errors.New(fieldName + " " + StrLength + " rule is error")
 				}
 				if len(v) < length {
-					return errors.New(fieldName + " field length  >= " + lenStr)
+					return errors.New("The " + fieldName + " must be at least " + lenStr + " characters.")
 				}
 			}
 		}
