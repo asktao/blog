@@ -23,7 +23,7 @@ When the application is run, the following endpoints will be available:
 ```
 {
     "title": "Hello World",
-    "content": "Blog API"
+    "content": "Blog API",
     "author": "Asktao"
 }
 ```
@@ -58,7 +58,7 @@ When the application is run, the following endpoints will be available:
         "id": <article_id>,
         "title": <article_title>,
         "content": <article_content>,
-        "author": <article_author>,
+        "author": <article_author>
      }
 }
 ```
@@ -88,15 +88,15 @@ offset=0
     "data": [
       {
         "id": <article_id>,
-        "title":<article_title>,
-        "content":<article_content>,
-        "author":<article_author>,
+        "title": <article_title>,
+        "content": <article_content>,
+        "author": <article_author>
       },
       {
         "id": <article_id>,
-        "title":<article_title>,
-        "content":<article_content>,
-        "author":<article_author>,
+        "title": <article_title>,
+        "content": <article_content>,
+        "author": <article_author>
       }
     ]
 }
