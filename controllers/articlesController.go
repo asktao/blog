@@ -24,18 +24,26 @@ type ArticleInterface interface{
 }
 
 func (ac *ArticleController) ShowArticle(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	defer func(){
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}()
+
 	params := mux.Vars(r)
 
 	id, _ := strconv.ParseUint(params["id"], 10, 64)
 
 	article, err := article.GetArticle(id)
 
-	if article.Id == 0 {
+	if (models.Article{}) == article {
 		http.NotFound(w, r)
 		return
 	}
 	if err != nil {
-		http.Error(w, "Query failed", http.StatusInternalServerError)
 		return
 	}
 
@@ -48,7 +56,8 @@ func (ac *ArticleController) IndexArticle(w http.ResponseWriter, r *http.Request
 
 	articles, err := article.ListArticle(limit, offset)
 	if err != nil {
-		http.Error(w, "Query failed", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	response := Response{http.StatusOK, "Success", articles}
@@ -56,23 +65,30 @@ func (ac *ArticleController) IndexArticle(w http.ResponseWriter, r *http.Request
 }
 
 func (ac *ArticleController) StoreArticle(w http.ResponseWriter, r *http.Request) {
+	var err error
+
+	defer func(){
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}()
 
 	Article := models.Article{}
-	err := json.NewDecoder(r.Body).Decode(&Article)
+	err = json.NewDecoder(r.Body).Decode(&Article)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	err = ac.Validator(&Article)
-	if err != nil {
-		response := Response{http.StatusUnprocessableEntity, err.Error(), nil}
+	validaErr := ac.Validator(&Article)
+	if validaErr != nil {
+		response := Response{http.StatusUnprocessableEntity, validaErr.Error(), nil}
 		ac.JsonResponse(w, response)
 		return
 	}
 
 	resp, err := article.SaveArticle(Article)
 	if err != nil {
-		http.Error(w, "Failed to write data", http.StatusInternalServerError)
+		return
 	}
 
 	response := Response{http.StatusCreated,"Success", resp}
