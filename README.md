@@ -8,6 +8,11 @@ Backend API for a simple blog
 1. `git clone http://github.com/asktao/blog && cd blog`
 2. Run using `docker-compose up -d`
 
+if you encounter the following error, you can try to run the command again. This is due to the internet connectivity issue.
+```
+go: error loading module requirements
+ERROR: Service 'blog-api' failed to build: The command '/bin/sh -c go build -o app .' returned a non-zero code: 1
+```
 
 When the application is run, the following endpoints will be available:
 
@@ -102,6 +107,15 @@ offset=0
 }
 ```
 
+### Stop
+
+1. Stop `docker-compose stop`
+
+
+### Validation unit test
+
+`go test -v controllers/validation_test.go controllers/validation.go`
+
 ### Using with Docker
 * [Docker](https://www.docker.com)
 
@@ -112,3 +126,4 @@ offset=0
 * [mux](github.com/gorilla/mux)
 * [gorm](https://github.com/jinzhu/gorm)
 * [dotenv](https://github.com/joho/godotenv)
+* [assert](https://github.com/stretchr/testify)
