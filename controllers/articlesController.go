@@ -18,7 +18,6 @@ type ArticleController struct {
 type ArticleInterface interface{
 	ControllerInterface
 	ValidationInterface
-	models.ArticleInterface
 	ShowArticle(w http.ResponseWriter, r *http.Request)
 	IndexArticle(w http.ResponseWriter, r *http.Request)
 	StoreArticle(w http.ResponseWriter, r *http.Request)
@@ -33,13 +32,15 @@ func (ac *ArticleController) ShowArticle(w http.ResponseWriter, r *http.Request)
 
 	if article.Id == 0 {
 		http.NotFound(w, r)
+		return
 	}
 	if err != nil {
 		http.Error(w, "Query failed", http.StatusInternalServerError)
+		return
 	}
 
 	response := Response{http.StatusOK,"Success", article}
-	ac.JsonResponse(w, http.StatusOK, response)
+	ac.JsonResponse(w, response)
 }
 
 func (ac *ArticleController) IndexArticle(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +52,7 @@ func (ac *ArticleController) IndexArticle(w http.ResponseWriter, r *http.Request
 	}
 
 	response := Response{http.StatusOK, "Success", articles}
-	ac.JsonResponse(w, http.StatusOK, response)
+	ac.JsonResponse(w, response)
 }
 
 func (ac *ArticleController) StoreArticle(w http.ResponseWriter, r *http.Request) {
@@ -62,18 +63,10 @@ func (ac *ArticleController) StoreArticle(w http.ResponseWriter, r *http.Request
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	type ValidateArticle struct {
-		Title   string	`valid:"required" json"title"`
-		Content string	`valid:"required" json"content"`
-		Author  string	`valid:"required" json:"author"`
-	}
-
-	validateArticle := &ValidateArticle{Article.Title, Article.Content, Article.Author}
-
-	err = ac.Validator(validateArticle)
+	err = ac.Validator(&Article)
 	if err != nil {
 		response := Response{http.StatusUnprocessableEntity, err.Error(), nil}
-		ac.JsonResponse(w, http.StatusUnprocessableEntity, response)
+		ac.JsonResponse(w, response)
 		return
 	}
 
@@ -82,6 +75,6 @@ func (ac *ArticleController) StoreArticle(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Failed to write data", http.StatusInternalServerError)
 	}
 
-	response := Response{http.StatusOK,"Success", resp}
-	ac.JsonResponse(w, http.StatusCreated, response)
+	response := Response{http.StatusCreated,"Success", resp}
+	ac.JsonResponse(w, response)
 }

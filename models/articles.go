@@ -2,9 +2,9 @@ package models
 
 type Article struct {
 	Id      uint64	`json:"id"`
-	Title   string	`json:"title"`
-	Content string	`json:"content"`
-	Author  string	`json:"author"`
+	Title   string	`valid:"required" json"title"`
+	Content string	`valid:"required" json"content"`
+	Author  string	`valid:"required" json:"author"`
 }
 
 type ArticleInterface interface {
