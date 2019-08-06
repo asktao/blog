@@ -8,6 +8,8 @@ services:
     image: api-go-blog
     ports:
       - 8080:8080
+    depends_on:
+      - mysql
     links:
       - mysql
   mysql:
