@@ -71,6 +71,12 @@ When the application is run, the following endpoints will be available:
 
 - Path: `/articles`
 
+- Query:
+```
+limit=10
+offset=0
+```
+
 - Response Header `HTTP 200`
 
 - Response Body:
