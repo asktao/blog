@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"blog/logging"
 	"blog/controllers"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -8,7 +9,7 @@ import (
 	"os"
 )
 
-var articleController controllers.ArticleController = controllers.ArticleController{}
+var articleController = controllers.ArticleController{}
 
 func Run() {
 	r := mux.NewRouter()
@@ -23,6 +24,7 @@ func Run() {
 
 	err := http.ListenAndServe(":" + port, r)
 	if err != nil {
+		logging.Error(err.Error())
 		fmt.Print(err)
 	}
 }

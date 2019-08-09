@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"blog/logging"
 	"blog/models"
 	"encoding/json"
 	"github.com/gorilla/mux"
@@ -8,7 +9,7 @@ import (
 	"strconv"
 )
 
-var article models.Article = models.Article{}
+var article = models.Article{}
 
 type ArticleController struct {
 	Controller
@@ -30,6 +31,7 @@ func (ac *ArticleController) ShowArticle(w http.ResponseWriter, r *http.Request)
 	defer func(){
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			logging.Error(err)
 		}
 	}()
 
@@ -57,6 +59,7 @@ func (ac *ArticleController) IndexArticle(w http.ResponseWriter, r *http.Request
 	articles, err := article.ListArticle(limit, offset)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		logging.Error(err)
 		return
 	}
 
@@ -70,6 +73,7 @@ func (ac *ArticleController) StoreArticle(w http.ResponseWriter, r *http.Request
 	defer func(){
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			logging.Error(err.Error())
 		}
 	}()
 

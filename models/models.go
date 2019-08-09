@@ -1,6 +1,7 @@
 package models
 
 import (
+	"blog/logging"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
@@ -26,6 +27,7 @@ func init() {
 	dbEnv := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", username, password, host, port, database)
 	conn, err := gorm.Open("mysql", dbEnv)
 	if err != nil {
+		logging.Error(err.Error())
 		log.Fatal("Failed to establish a MySQL link")
 	}
 
