@@ -3,7 +3,6 @@ package repository
 import (
 	"blog/article/repository"
 	"blog/models"
-	"context"
 	"database/sql"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jinzhu/gorm"
@@ -18,7 +17,7 @@ type Suite struct {
 	suite.Suite
 	DB	*gorm.DB
 	mock sqlmock.Sqlmock
-	//repository repository.ArticleRepository
+	repository repository.ArticleRepositoryInterface
 	article *models.Article
 }
 
@@ -42,24 +41,75 @@ func (s *Suite) SetupSuite() {
 func (s *Suite) AfterTest(_, _ string) {
 	require.NoError(s.T(), s.mock.ExpectationsWereMet())
 }
-//
-//func TestInit(t *testing.T) {
-//	suite.Run(t, new(Suite))
-//}
 
-func (s *Suite) TestGetArticle(t *testing.T) {
+func (s *Suite) TestSaveArticle(t *testing.T) {
+
+	mockArticle := &models.Article{
+		Id:			1,
+		Title:		"Title",
+		Content:	"Content",
+		Author:		"Bruce",
+	}
+
 	s.mock.ExpectQuery(regexp.QuoteMeta(
-		`SELECT * FROM "articles" WHERE (id = $1)`)).
-		WithArgs(id.String()).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "name"}).
-			AddRow(id.String(), name))
+		`INSERT INTO "articles" ("id", "title", "content", "author") 
+			VALUES ($1,$2) RETURNING "article"."id"`)).
+		WithArgs(mockArticle).
+		WillReturnRows(
+			sqlmock.NewRows([]string{"id", "title", "content", "author"}).
+				AddRow(mockArticle.Id, mockArticle.Title, mockArticle.Content, mockArticle.Author))
 
+	id, err := s.repository.SaveArticle(mockArticle)
 
-	anArticle, err := r.GetArticle(context.TODO())
-	assert.NoError(t, err)
-	assert.NotNil(t, anArticle)
+	assert.Equal(t, id, mockArticle.Id)
+	require.NoError(s.T(), err)
 }
 
-func TestSaveArticle(t *testing.T) {
+func (s *Suite) TestGetArticle(t *testing.T) {
 
+	mockArticle := &models.Article{
+		Id:			1,
+		Title:		"Title",
+		Content:	"Content",
+		Author:		"Bruce",
+	}
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		`SELECT * FROM "articles" WHERE (id = $1)`)).
+		WithArgs(mockArticle).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "title", "content", "author"}).
+			AddRow(mockArticle.Id))
+
+	anArticle, err := s.repository.GetArticle(mockArticle.Id)
+	assert.NoError(t, err)
+	assert.NotNil(t, anArticle)
+	assert.Equal(t, mockArticle, anArticle)
+}
+
+func (s *Suite) TestListArticle(t *testing.T) {
+	mockArticles := []models.Article{
+		{
+			Id:      1,
+			Title:   "Title",
+			Content: "Content",
+			Author:  "Bruce",
+		},
+		{
+			Id:      2,
+			Title:   "Title",
+			Content: "Content",
+			Author:  "Bruce",
+		},
+	}
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(
+		`SELECT * FROM "articles"`)).
+		WithArgs(mockArticles).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "title", "content", "author"}).
+			AddRow(mockArticles))
+
+	anArticle, err := s.repository.ListArticle(10, 0)
+	assert.NoError(t, err)
+	assert.NotNil(t, anArticle)
+	assert.Equal(t, mockArticles, anArticle)
 }

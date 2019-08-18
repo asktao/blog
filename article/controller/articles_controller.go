@@ -42,7 +42,7 @@ func (ac *ArticleController) ShowArticle(w http.ResponseWriter, r *http.Request)
 
 	ret, err := ac.AUsecase.GetArticle(id)
 
-	if (models.Article{}) == ret {
+	if (&models.Article{}) == ret {
 		http.NotFound(w, r)
 		return
 	}
@@ -91,7 +91,7 @@ func (ac *ArticleController) StoreArticle(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	resp, err := ac.AUsecase.SaveArticle(Article)
+	resp, err := ac.AUsecase.SaveArticle(&Article)
 	if err != nil {
 		return
 	}
