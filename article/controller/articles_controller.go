@@ -2,7 +2,6 @@ package controller
 
 import (
 	"blog/article"
-	"blog/logging"
 	"blog/models"
 	"encoding/json"
 	"github.com/gorilla/mux"
@@ -20,19 +19,18 @@ func NewArticleController(r *mux.Router, us article.Usecase){
 	articleController := &ArticleController{
 		AUsecase: us,
 	}
-	r.HandleFunc("/articles", articleController.IndexArticle).Methods("GET")
-	r.HandleFunc("/articles", articleController.StoreArticle).Methods("POST")
-	r.HandleFunc("/articles/{id:[0-9]+}", articleController.ShowArticle).Methods("GET")
+	r.HandleFunc("/articles", articleController.ListArticle).Methods("GET")
+	r.HandleFunc("/articles", articleController.SaveArticle).Methods("POST")
+	r.HandleFunc("/articles/{id:[0-9]+}", articleController.GetArticle).Methods("GET")
 }
 
-func (ac *ArticleController) ShowArticle(w http.ResponseWriter, r *http.Request) {
+func (ac *ArticleController) GetArticle(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 
 	defer func(){
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			logging.Error(err)
 		}
 	}()
 
@@ -54,13 +52,12 @@ func (ac *ArticleController) ShowArticle(w http.ResponseWriter, r *http.Request)
 	ac.JsonResponse(w, response)
 }
 
-func (ac *ArticleController) IndexArticle(w http.ResponseWriter, r *http.Request) {
+func (ac *ArticleController) ListArticle(w http.ResponseWriter, r *http.Request) {
 	limit, offset := ac.Pagination(r)
 
 	articles, err := ac.AUsecase.ListArticle(limit, offset)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logging.Error(err)
 		return
 	}
 
@@ -68,13 +65,12 @@ func (ac *ArticleController) IndexArticle(w http.ResponseWriter, r *http.Request
 	ac.JsonResponse(w, response)
 }
 
-func (ac *ArticleController) StoreArticle(w http.ResponseWriter, r *http.Request) {
+func (ac *ArticleController) SaveArticle(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	defer func(){
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			logging.Error(err.Error())
 		}
 	}()
 

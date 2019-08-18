@@ -15,7 +15,7 @@ func NewArticleUsecase (ar article.Repository) article.Usecase {
 	}
 }
 
-func (au *articleUsecase) ShowArticle(id int64) (*models.Article, error) {
+func (au *articleUsecase) GetArticle(id uint64) (*models.Article, error) {
 
 	res, err := au.articleRepository.GetArticle(id)
 
@@ -26,7 +26,7 @@ func (au *articleUsecase) ShowArticle(id int64) (*models.Article, error) {
 	return res, nil
 }
 
-func (au *articleUsecase) IndexArticle(limit int64, offset int64) ([]*models.Article, error) {
+func (au *articleUsecase) ListArticle(limit uint64, offset uint64) ([]*models.Article, error) {
 
 	res, err := au.articleRepository.ListArticle(limit, offset)
 
@@ -37,12 +37,12 @@ func (au *articleUsecase) IndexArticle(limit int64, offset int64) ([]*models.Art
 	return res, nil
 }
 
-func (au *articleUsecase) StoreArticle(m *models.Article) (*models.Article, error) {
+func (au *articleUsecase) SaveArticle(m *models.Article) (id uint64, err error) {
 
 	res, err := au.articleRepository.SaveArticle(m)
 
 	if err != nil {
-		return nil, err
+		return res, err
 	}
 
 	return res, err

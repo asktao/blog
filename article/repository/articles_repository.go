@@ -21,8 +21,9 @@ func NewArticleRepository(DB *gorm.DB) article.Repository {
 }
 
 func (A ArticleRepository) GetArticle(id uint64) (article *models.Article, err error) {
+	article = new(models.Article)
 
-	if err := A.DB.Where("id = ? ", id).First(&article).Error; err != nil {
+	if err := A.DB.Where("id = ? ", id).First(article).Error; err != nil {
 		return article, err
 	}
 

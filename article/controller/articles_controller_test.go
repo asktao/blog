@@ -11,24 +11,25 @@ import (
 	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 )
 
-func TestStoreArticle(t *testing.T) {
+func TestSaveArticle(t *testing.T) {
 	mockArticle := models.Article{
+		Id:			0,
 		Title:		"Title",
 		Content:	"Content",
 		Author:		"Bruce",
 	}
 	tempMockArticle := mockArticle
-	tempMockArticle.Id = 0
 	mockUCase := new(mocks.Usecase)
 
 	j, err := json.Marshal(tempMockArticle)
 	assert.NoError(t, err)
 
-	mockUCase.On("StoreArticle", mock.Anything, mock.AnythingOfType("*models.Article")).Return(nil)
+	mockUCase.On("SaveArticle", mock.AnythingOfType("*models.Article")).Return(nil)
 
 	req, err := http.NewRequest("POST", "/articles", strings.NewReader(string(j)))
 	assert.NoError(t, err)
@@ -41,10 +42,8 @@ func TestStoreArticle(t *testing.T) {
 	handler := controller.ArticleController{
 		AUsecase: mockUCase,
 	}
-	r.HandleFunc("/articles", handler.StoreArticle).Methods("POST")
+	r.HandleFunc("/articles", handler.SaveArticle).Methods("POST")
 
-	//c := e.NewContext(req, rec)
-	//c.SetPath("/article")
 	r.ServeHTTP(rec, req)
 	require.NoError(t, err)
 
@@ -53,21 +52,63 @@ func TestStoreArticle(t *testing.T) {
 
 }
 
-//func TestShowArticle(t *testing.T) {
-//
-//	request, _ := http.NewRequest("GET", "/articles/1", nil)
-//	response := httptest.NewRecorder()
-//	Router().ServeHTTP(response, request)
-//	if response.Code != http.StatusOK {
-//		t.Errorf("HTTP Response code expecting: %d Got %d", http.StatusOK, response.Code)
-//	}
-//}
-//
-//func TestIndexArticle(t *testing.T) {
-//	request, _ := http.NewRequest("GET", "/articles", nil)
-//	response := httptest.NewRecorder()
-//	Router().ServeHTTP(response, request)
-//	if response.Code != http.StatusOK {
-//		t.Errorf("HTTP Response code expecting: %d Got %d", http.StatusOK, response.Code)
-//	}
-//}
+func TestGetArticle(t *testing.T) {
+
+	mockArticle := models.Article{
+		Id:			0,
+		Title:		"Title",
+		Content:	"Content",
+		Author:		"Bruce",
+	}
+	mockUCase := new(mocks.Usecase)
+
+	id := int(mockArticle.Id)
+
+	mockUCase.On("GetArticle", uint64(id)).Return(&mockArticle, nil)
+
+	req, err := http.NewRequest("GET", "/articles/" + strconv.Itoa(id), strings.NewReader(string("")))
+
+	assert.NoError(t, err)
+
+	rec := httptest.NewRecorder()
+	r := mux.NewRouter()
+	handler := controller.ArticleController{
+		AUsecase: mockUCase,
+	}
+	r.HandleFunc("/articles/" + strconv.Itoa(id), handler.GetArticle).Methods("GET")
+	r.ServeHTTP(rec, req)
+	require.NoError(t, err)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+	mockUCase.AssertExpectations(t)
+}
+
+func TestListArticle(t *testing.T) {
+	mockArticle := models.Article{
+		Id:			0,
+		Title:		"Title",
+		Content:	"Content",
+		Author:		"Bruce",
+	}
+	mockUCase := new(mocks.Usecase)
+	mockListArticle := make([]*models.Article, 0)
+	mockListArticle = append(mockListArticle, &mockArticle)
+	var limit uint64 = 10
+	var offset uint64 = 0
+	mockUCase.On("ListArticle", limit, offset).Return(mockListArticle, nil)
+
+	req, err := http.NewRequest("GET", "/articles?limit=10&offset=0", strings.NewReader(""))
+	assert.NoError(t, err)
+
+	rec := httptest.NewRecorder()
+	r := mux.NewRouter()
+	handler := controller.ArticleController{
+		AUsecase: mockUCase,
+	}
+	r.HandleFunc("/articles", handler.ListArticle).Methods("GET")
+	r.ServeHTTP(rec, req)
+	require.NoError(t, err)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+	mockUCase.AssertExpectations(t)
+}

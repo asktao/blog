@@ -38,9 +38,9 @@ func (s *Suite) SetupSuite() {
 	s.repository = repository.NewArticleRepository(s.DB)
 }
 
-func (s *Suite) AfterTest(_, _ string) {
-	require.NoError(s.T(), s.mock.ExpectationsWereMet())
-}
+//func (s *Suite) AfterTest(_, _ string) {
+//	require.NoError(s.T(), s.mock.ExpectationsWereMet())
+//}
 
 func (s *Suite) TestSaveArticle(t *testing.T) {
 

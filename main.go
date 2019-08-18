@@ -3,7 +3,7 @@ package main
 import (
 	"blog/article/controller"
 	"blog/article/repository"
-	"blog/logging"
+	"blog/article/usecase"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -30,7 +30,6 @@ func main() {
 	dbEnv := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", username, password, host, port, database)
 	conn, err := gorm.Open("mysql", dbEnv)
 	if err != nil {
-		logging.Error(err.Error())
 		log.Fatal("Failed to establish a MySQL link")
 	}
 
@@ -47,7 +46,9 @@ func main() {
 
 	r := mux.NewRouter()
 	ar := repository.NewArticleRepository(conn)
-	controller.NewArticleController(r, ar)
+	au := usecase.NewArticleUsecase(ar)
+
+	controller.NewArticleController(r, au)
 
 	port = os.Getenv("APP_PORT")
 	if port == "" {
@@ -56,7 +57,6 @@ func main() {
 
 	err = http.ListenAndServe(":"+port, r)
 	if err != nil {
-		logging.Error(err.Error())
-		fmt.Print(err)
+		log.Fatal(err)
 	}
 }
