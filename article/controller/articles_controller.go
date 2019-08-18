@@ -1,6 +1,7 @@
-package controllers
+package controller
 
 import (
+	"blog/article"
 	"blog/logging"
 	"blog/models"
 	"encoding/json"
@@ -9,19 +10,19 @@ import (
 	"strconv"
 )
 
-var article = models.Article{}
-
 type ArticleController struct {
 	Controller
 	Validation
+	AUsecase article.Usecase
 }
 
-type ArticleInterface interface{
-	ControllerInterface
-	ValidationInterface
-	ShowArticle(w http.ResponseWriter, r *http.Request)
-	IndexArticle(w http.ResponseWriter, r *http.Request)
-	StoreArticle(w http.ResponseWriter, r *http.Request)
+func NewArticleController(r *mux.Router, us article.Usecase){
+	articleController := &ArticleController{
+		AUsecase: us,
+	}
+	r.HandleFunc("/articles", articleController.IndexArticle).Methods("GET")
+	r.HandleFunc("/articles", articleController.StoreArticle).Methods("POST")
+	r.HandleFunc("/articles/{id:[0-9]+}", articleController.ShowArticle).Methods("GET")
 }
 
 func (ac *ArticleController) ShowArticle(w http.ResponseWriter, r *http.Request) {
@@ -39,9 +40,9 @@ func (ac *ArticleController) ShowArticle(w http.ResponseWriter, r *http.Request)
 
 	id, _ := strconv.ParseUint(params["id"], 10, 64)
 
-	article, err := article.GetArticle(id)
+	ret, err := ac.AUsecase.GetArticle(id)
 
-	if (models.Article{}) == article {
+	if (models.Article{}) == ret {
 		http.NotFound(w, r)
 		return
 	}
@@ -49,14 +50,14 @@ func (ac *ArticleController) ShowArticle(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	response := Response{http.StatusOK,"Success", article}
+	response := Response{http.StatusOK,"Success", ret}
 	ac.JsonResponse(w, response)
 }
 
 func (ac *ArticleController) IndexArticle(w http.ResponseWriter, r *http.Request) {
 	limit, offset := ac.Pagination(r)
 
-	articles, err := article.ListArticle(limit, offset)
+	articles, err := ac.AUsecase.ListArticle(limit, offset)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logging.Error(err)
@@ -90,7 +91,7 @@ func (ac *ArticleController) StoreArticle(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	resp, err := article.SaveArticle(Article)
+	resp, err := ac.AUsecase.SaveArticle(Article)
 	if err != nil {
 		return
 	}
